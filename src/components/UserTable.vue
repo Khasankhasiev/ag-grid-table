@@ -13,7 +13,6 @@
 <script setup>
 import { ref } from 'vue'
 import { AgGridVue } from 'ag-grid-vue3'
-import axios from 'axios'
 
 const gridApi = ref(null)
 const columnDefs = ref([
@@ -39,8 +38,12 @@ const rowData = ref([])
 
 const fetchData = async () => {
   try {
-    const response = await axios.get('https://randomuser.me/api/?results=5')
-    rowData.value = response.data.results
+    const response = await fetch('https://randomuser.me/api/?results=5')
+    if (!response.ok) {
+      throw new Error('Ошибка сети')
+    }
+    const data = await response.json()
+    rowData.value = data.results
   } catch (error) {
     console.error('Ошибка при получении пользователей:', error)
     const event = new CustomEvent('log-event', { detail: 'Ошибка при получении пользователей' })
